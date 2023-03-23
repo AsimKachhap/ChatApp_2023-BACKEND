@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const ChatModel = mongoose.Schema(
+const ChatSchema = mongoose.Schema(
   {
     chatName: {
       type: String,
@@ -36,4 +36,4 @@ const ChatModel = mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Chat", ChatModel);
+module.exports = mongoose.model("Chat", ChatSchema);
