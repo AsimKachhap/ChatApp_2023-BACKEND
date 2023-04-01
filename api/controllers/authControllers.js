@@ -3,8 +3,6 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
 exports.register = async (req, res) => {
-  const password = req.body.password;
-  const hashedPassWord = await bcrypt.hash(password, 12);
   if (!req.body.username || !req.body.email || !req.body.password) {
     res.status(400).json({
       status: "FAILURE",
@@ -21,7 +19,7 @@ exports.register = async (req, res) => {
         const savedUser = new User({
           username: req.body.username,
           email: req.body.email,
-          password: hashedPassWord,
+          password: req.body.password,
         });
         await savedUser.save();
         res.status(200).json({
