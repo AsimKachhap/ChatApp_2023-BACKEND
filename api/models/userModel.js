@@ -17,6 +17,7 @@ const userSchema = mongoose.Schema(
     password: {
       type: String,
       required: [true, "Please enter your Password."],
+      select: false,
     },
 
     displayPicture: {
@@ -30,10 +31,19 @@ const userSchema = mongoose.Schema(
   }
 );
 
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
 userSchema.pre("save", async function (next) {
   if (!this.isModified) return next();
 
   this.password = await bcrypt.hash(this.password, 12);
+
+  // if confirmPassword field is availablle, don't store in db: This can be done by
+  // this.confirmPassword = undefined;
+
+  next();
 });
 
 module.exports = mongoose.model("User", userSchema);

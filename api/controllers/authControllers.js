@@ -2,6 +2,10 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
+const signToken = (id) => {
+  return jwt.sign({ id: id }, process.env.JWT_SECRET);
+};
+
 exports.register = async (req, res) => {
   if (!req.body.username || !req.body.email || !req.body.password) {
     res.status(400).json({
@@ -33,19 +37,28 @@ exports.register = async (req, res) => {
   }
 };
 
-// FINDING A USER BY USERNAME
-exports.getUser = async (req, res) => {
-  try {
-    const user = await User.find({ email: req.body.email });
-    console.log(req.body.email);
+// LOGING IN THE USER
+exports.login = async (req, res) => {
+  const user = await User.findOne({ email: req.body.email }).select(
+    "+password"
+  );
+
+  // VERY VERY IMPORTANT
+  // set 'select: false' in password field in Schema so taht password will not be exposed everytime whenever we query a document.
+  //You will explecitly need to select passwod while loging in by usling .select method.
+
+  const loggedIn = user && (await user.matchPassword(req.body.password));
+  const token = signToken(user._id);
+
+  if (loggedIn) {
     res.status(200).json({
       status: "SUCCESS",
-      data: user,
+      token: token,
     });
-  } catch (error) {
-    res.status(400).json({
-      status: "FAILURE",
-      error: error,
+  } else {
+    res.status(203).json({
+      status: "FAIL",
+      message: "User not found",
     });
   }
 };
