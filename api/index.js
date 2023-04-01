@@ -1,8 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
+const userRoutes = require("../api/routes/userRoutes");
 
 const app = express();
+
+app.use(express.json());
 
 app.use(morgan("dev"));
 
@@ -19,10 +22,14 @@ require("dotenv").config();
   }
 })();
 
+// ROUTING MIDDLEWARES
 app.get("/", (req, res) => {
   console.log("Welcome You are on Home Page.");
   res.send("Welcome You are on Home Page.");
 });
+
+// USERS ROUTE
+app.use("/api/v1/users", userRoutes);
 
 const PORT = process.env.PORT || 8080;
 
